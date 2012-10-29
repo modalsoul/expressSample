@@ -15,6 +15,25 @@ var express = require('express')
  */
 var app = express();
 
+/**
+ * log4jsの読み込み
+ */
+var log4js = require('log4js');
+/**
+ * ログのファイル出力先とローテーション規則、ローテーションしたログファイルのPostFixの指定
+ */
+log4js.configure({
+	appenders: [{
+	"type": "dateFile",
+	"filename": "logs/access.log",
+	"pattern": "-yyyy-MM-dd"
+	}]
+});
+/**
+ * Loggerの取得
+ */
+var logger = log4js.getLogger('dateFile');
+
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -23,6 +42,23 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  
+  /**
+   * アクセスログの出力
+   */
+  app.use(function(req, res, next){
+	  logger.info([
+			  req.headers['x-forwarded-for'] || req.client.remoteAddress,
+		      new Date().toLocaleString(),
+		      req.method,
+		      req.url,
+		      res.statusCode,
+		      req.headers.referer || '-',
+		      req.headers['user-agent'] || '-'
+		      ].join('\t')
+		      );
+      next();
+  });
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });

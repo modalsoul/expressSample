@@ -1,3 +1,4 @@
+/** @module expressSample/app */
 
 /**
  * Module dependencies.
@@ -17,10 +18,14 @@ var app = express();
 
 /**
  * log4jsの読み込み
+ * @param {string} モジュール名:log4js
+ * @return {object} log4jsモジュール
  */
 var log4js = require('log4js');
+
 /**
  * ログのファイル出力先とローテーション規則、ローテーションしたログファイルのPostFixの指定
+ * @param {string} log4jsの設定値
  */
 log4js.configure({
 	appenders: [{
@@ -31,6 +36,8 @@ log4js.configure({
 });
 /**
  * Loggerの取得
+ * @param {string} 取得するロガータイプ
+ * @return {object} Logger
  */
 var logger = log4js.getLogger('dateFile');
 
